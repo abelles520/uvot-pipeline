@@ -26,6 +26,10 @@ Once data are downloaded, they must be processed and combined into mosaics for p
 
 Aperture photometry and total magntiudes are calculated using this script. An input file specifying where the data are located and the aperture size and shape are needed. 
 
+```masking_data.ipynb```
+
+Masks from the z0 Massive Galaxy Synthesis (z0MGS) can be used to mask foreground stars. For many nearby galaxies, they have GALEX NUV 7.5" resolution masks that can be downloaded from [here](https://irsa.ipac.caltech.edu/data/WISE/z0MGS/index.html).
+
 #### Data Files
 
 ```correction_factors_??.txt```
@@ -38,4 +42,5 @@ This file contains the names of the objects to be downloaded.
 
 ```gal_info.txt```
 
-This file contains the aperture photometry information needed to do the photometry calculation. The columns are name, ra, dec, 2a, 2b, and PA. 
+This file contains the aperture photometry information needed to do the photometry calculation. The columns are name, ra, dec, semimajor, semiminor, and PA. Be careful about whether the code requires the semi-major axis or the major axis (2a). There is not consistency across these packages. 
+
