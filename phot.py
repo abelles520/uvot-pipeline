@@ -10,13 +10,13 @@ from surface_phot import surface_phot
 from make_aperture_image import make_aperture_image
 from phot_plot import phot_plot
 
-# add optical bands info
-
+# the quoted zero point error is less for the optical bands but left as 0.03 mag here. 
 zeropt_dict = {'w1': 18.95,'w2': 19.11,'m2': 18.54, 'uu':19.36, 'bb':18.98, 'vv':17.88}
 zeropt_err = 0.03  # mags
 
 def phot(name, ra, dec, a, b, pa, mask):
 
+    # scaling factor of aperture size
     ap = 1
    
     os.chdir(name)
@@ -38,8 +38,6 @@ def phot(name, ra, dec, a, b, pa, mask):
         print(filt)
 
         # nonoffset
-        # change _corr_ to _
-
         try:
             surface_phot(name+'_corr_'+filt+'_', ra, dec, a, b, pa,
                      2, zeropt_dict[filt], zeropoint_err=zeropt_err,
@@ -54,7 +52,6 @@ def phot(name, ra, dec, a, b, pa, mask):
 
        
         # offset
-        # change _corr_offset_ to _offset_
         try:
             surface_phot(name+'_corr_offset_'+filt+'_', ra, dec, a, b, pa,
                      2, zeropt_dict[filt], zeropoint_err=zeropt_err,
@@ -97,9 +94,10 @@ if __name__=='__main__':
     df.columns = ['Name', 'RA', 'Dec', 'a', 'b', 'PA']
     issues = []
     for ind, row in df.iterrows():
+        # masks are optional. these are the galex 7.5" masks from the z0MGS survey. I convert the fits mask to a reg file. 
         maskfile = f"/Users/alex/Documents/nearby_ulxs/masks/{row['Name'].lower()}_nuv_gauss7p5_stars.reg"
         try:
-            phot(row['Name'], row['RA'], row['Dec'], row['a'], row['b'], row['PA']+90,  maskfile) # None)#
+            phot(row['Name'], row['RA'], row['Dec'], row['a'], row['b'], row['PA']+90,  maskfile) 
         except Exception as e:
             print(e)
             issues.append(row['Name']+str(e))
