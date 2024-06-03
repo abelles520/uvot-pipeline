@@ -12,26 +12,38 @@ sys.path.append('uvot-mosaic/uvot-mosaic')
 from uvot_deep import uvot_deep
 from offset_mosaic import offset_mosaic
 
-# run uvot deep on all images
-# apply sens loss correction
-# uvotimsum 
-# offset_mosaic
+# Rough outline of processing steps
+#     run uvot deep on all images
+#        This is based on Mike Siegel's IDL script and was written by Lea Hagen
+#     apply sens loss correction
+#        The time dependent throughput loss is accounted for based on the observation data
+#        of each individual snapshot
+#     uvotimsum 
+#        The individual snapshots are summed together using the heasoft tool 
+#     offset_mosaic
+#        When summing large quantities of data, the background between objects can vary due to the
+#        location of the Sun, Moon, and earth limb. This ostensibly corrects for the variations. 
+#        In my work, using this has produced photometry that agrees with the non offset corrected 
+#        values. It also produced smaller error bars in a few cases. My GOODS-N work shows an 
+#        alternative way to combine various exposures of the same target to get a uniform bkg.
+
 
 # sensitivity loss using the look-up table
-
 def apply_sens_loss_corr(cr, date, filt):
     """
     inputs:
     cr - float or array that contains count rate information, it will be
          multipled by a correction factor
-    date - string denoting date that data was taken
-    filt - string that denotes which Swift/UVOT filter to correct 
+    date - string denoting date that data was taken. Date format is the same as in the UVOT image header
+    filt - string that denotes which Swift/UVOT filter to correct. two char version
     
     returns:
     cr_corr - float or array that contains the corrected 
     """
     
     data_date = datetime.datetime.strptime(date.split('T')[0], '%Y-%m-%d')
+    
+    # start of mission
     start_date = datetime.datetime(2005,1,1)
     
     difference = data_date-start_date
@@ -64,6 +76,8 @@ def apply_sens_loss_corr(cr, date, filt):
 
     return cr*factor
 
+# function to apply sens loss correction to the sk_all fits files
+# the sk_all corr file is saved and the corrected version is summed
 def sens_loss(name):
 
     os.chdir(name)
@@ -115,7 +129,6 @@ def sens_loss(name):
         # exposure map
         # create symlinks for ex_all and summed ex file
         # only the counts image gets scaled for the sensitivity loss
-
        
         tmp = str(out_sk).split('_')
         tmp.remove('sk.fits')
@@ -143,6 +156,8 @@ def sens_loss(name):
 
     os.chdir('..')
 
+
+# this applies the offset correction and summs the corrected images. 
 def stack(name, mask):
    
     os.chdir(name)
@@ -182,12 +197,12 @@ if __name__=='__main__':
     gals = glob.glob('n*/')
 
     for gal in gals[1:]:
-        #os.chdir(gal)
-        #obs_id = glob.glob('0*')
+        os.chdir(gal)
+        obs_id = glob.glob('0*')
 
-        #uvot_deep(obs_id, f'{gal[:-1]}_')
-        #os.chdir('..')
+        uvot_deep(obs_id, f'{gal[:-1]}_')
+        os.chdir('..')
 
-        #sens_loss(gal[:-1])  
+        sens_loss(gal[:-1])  
         maskfile = f"/Users/alex/Documents/nearby_ulxs/masks/{gal[:-1]}_nuv_gauss7p5_stars.reg"
         stack(gal[:-1], mask=maskfile)
