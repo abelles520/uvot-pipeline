@@ -28,10 +28,12 @@ Aperture photometry and total magntiudes are calculated using this script. An in
 
 #### Data Files
 
-```correction_factor_??.txt```
+```correction_factors_??.txt```
 
 Due to sensitivity loss of the UVOT detectors, there is a time dependent sensitivity loss correction that needs to be applied. These files give the correction factors for the UV filters. The optical filters have simpler corrections (as of 2024) that are hardcoded in. 
 
-``` ```
+```names.txt```
+This file contains the names of the objects to be downloaded. 
 
-
+```gal_info.txt```
+This file contains the aperture photometry information needed to do the photometry calculation.
